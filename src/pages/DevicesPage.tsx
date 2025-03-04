@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import DeviceCard from '../components/DeviceCard'
 import DeviceForm from '../components/DeviceForm'
 import EditDeviceModal from '../components/EditDeviceModal'
@@ -17,25 +17,39 @@ export default function DevicesPage() {
   const [editingDevice, setEditingDevice] = useState(null)
   const [deviceToRemove, setDeviceToRemove] = useState(null)
 
+  useEffect(() => {
+    const storedDevices = localStorage.getItem('devices')
+    if (storedDevices) {
+      setDevices(JSON.parse(storedDevices))
+    }
+  }, [])
+
   const handleAddDevice = (newDevice) => {
-    setDevices([...devices, {
+    const updatedDevices = [...devices, {
       ...newDevice,
       id: generateDeviceId(newDevice.preset),
       image: DEVICE_IMAGE,
       preset: newDevice.preset
-    }])
+    }]
+    setDevices(updatedDevices)
+    localStorage.setItem('devices', JSON.stringify(updatedDevices))
     setShowForm(false)
   }
 
   const handleEditDevice = (updatedDevice) => {
-    setDevices(devices.map(d => 
-      d.id === updatedDevice.id ? { ...d, ...updatedDevice } : d
-    ))
+    const updatedDevices = devices.map(d => 
+      d.id === updatedDevice.id ? { ...updatedDevice } : d
+    )
+    setDevices(updatedDevices)
+    localStorage.setItem('devices', JSON.stringify(updatedDevices))
     setEditingDevice(null)
   }
 
   const handleRemoveDevice = () => {
-    setDevices(devices.filter(d => d.id !== deviceToRemove))
+    const updatedDevices = devices.filter(d => d.id !== deviceToRemove)
+    setDevices(updatedDevices)
+    localStorage.setItem('devices', JSON.stringify(updatedDevices))
+    localStorage.removeItem(`channelValues-${deviceToRemove}`)
     setDeviceToRemove(null)
   }
 

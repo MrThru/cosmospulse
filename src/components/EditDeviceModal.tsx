@@ -10,6 +10,7 @@ interface EditDeviceModalProps {
     preset: string
   }
   onSave: (data: {
+    id: string
     name: string
     dmxAddress: string
     size: string
@@ -34,7 +35,10 @@ export default function EditDeviceModal({ device, onSave, onClose }: EditDeviceM
         <DeviceForm 
           initialData={device}
           onSubmit={(data) => {
-            onSave(data)
+            onSave({
+              ...data,
+              id: device.id // Ensure we keep the same ID
+            })
             onClose()
           }}
         />

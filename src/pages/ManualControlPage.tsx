@@ -1,31 +1,56 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
 
 interface Device {
   id: string
   name: string
-  channels: number
+  size: string
+  dmxAddress: string
+  preset: string
 }
 
-// Mock data - replace with actual device data later
-const mockDevices: Device[] = [
-  { id: 'COS001', name: 'Nebula Light 1', channels: 8 },
-  { id: 'COS002', name: 'Galaxy Scanner 1', channels: 12 },
-]
-
 export default function ManualControlPage() {
+  const [devices, setDevices] = useState<Device[]>([])
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null)
   const [channelValues, setChannelValues] = useState<number[]>([])
 
+  useEffect(() => {
+    const storedDevices = localStorage.getItem('devices')
+    if (storedDevices) {
+      const parsedDevices = JSON.parse(storedDevices)
+      setDevices(parsedDevices)
+
+      const storedSelectedDeviceId = localStorage.getItem('selectedDeviceId')
+      if (storedSelectedDeviceId) {
+        const device = parsedDevices.find((d: Device) => d.id === storedSelectedDeviceId)
+        if (device) {
+          setSelectedDevice(device)
+          const storedValues = localStorage.getItem(`channelValues-${device.id}`)
+          setChannelValues(
+            storedValues ? JSON.parse(storedValues) : new Array(parseInt(device.size)).fill(0)
+          )
+        }
+      }
+    }
+  }, [])
+
   const handleDeviceSelect = (device: Device) => {
     setSelectedDevice(device)
-    setChannelValues(new Array(device.channels).fill(0))
+    const storedValues = localStorage.getItem(`channelValues-${device.id}`)
+    const newValues = storedValues
+      ? JSON.parse(storedValues)
+      : new Array(parseInt(device.size)).fill(0)
+    setChannelValues(newValues)
+    localStorage.setItem('selectedDeviceId', device.id)
   }
 
   const handleChannelChange = (index: number, value: number) => {
     const newValues = [...channelValues]
     newValues[index] = value
     setChannelValues(newValues)
+    if (selectedDevice) {
+      localStorage.setItem(`channelValues-${selectedDevice.id}`, JSON.stringify(newValues))
+    }
   }
 
   return (
@@ -39,12 +64,12 @@ export default function ManualControlPage() {
               className="w-full px-4 py-2.5 bg-black/50 text-white rounded-lg appearance-none border border-cosmos/20 focus:border-cosmos focus:outline-none"
               value={selectedDevice?.id || ''}
               onChange={(e) => {
-                const device = mockDevices.find(d => d.id === e.target.value)
+                const device = devices.find(d => d.id === e.target.value)
                 if (device) handleDeviceSelect(device)
               }}
             >
               <option value="">Select a device...</option>
-              {mockDevices.map(device => (
+              {devices.map(device => (
                 <option key={device.id} value={device.id}>
                   {device.name} ({device.id})
                 </option>
