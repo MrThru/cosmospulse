@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Play } from 'lucide-react'
+import { Play, Download } from 'lucide-react'
 
 export default function ShowControlPage() {
   const [isRunning, setIsRunning] = useState(false)
@@ -17,6 +17,18 @@ export default function ShowControlPage() {
     const action = isRunning ? 'Stopping' : 'Starting'
     setLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${action} show...`])
     setIsRunning(prev => !prev)
+  }
+
+  const handleDownloadLogs = () => {
+    const blob = new Blob([logs.join('\n')], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `cosmospulse-logs-${new Date().toISOString()}.txt`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -52,7 +64,16 @@ export default function ShowControlPage() {
 
         {showConsoleLogs && (
           <div className="mt-8 bg-black/30 p-4 rounded-lg border border-cosmos/10">
-            <h2 className="text-xl font-bold mb-4 text-white">Console Logs</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-white">Console Logs</h2>
+              <button
+                onClick={handleDownloadLogs}
+                className="flex items-center gap-2 bg-cosmos/50 hover:bg-cosmos/70 text-white px-3 py-1.5 rounded-md transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                <span>Download Logs</span>
+              </button>
+            </div>
             <div className="h-48 overflow-y-auto bg-black/20 p-2 rounded">
               {logs.map((log, i) => (
                 <div key={i} className="text-sm text-gray-300 font-mono">

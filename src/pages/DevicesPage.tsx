@@ -4,6 +4,8 @@ import DeviceForm from '../components/DeviceForm'
 import EditDeviceModal from '../components/EditDeviceModal'
 import { Plus } from 'lucide-react'
 
+const DEVICE_IMAGE = "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+
 function generateDeviceId(preset: string) {
   const randomNumber = Math.floor(Math.random() * 900) + 100
   return preset === 'Custom' ? `OTH-${randomNumber}` : `COS-${randomNumber}`
@@ -19,7 +21,7 @@ export default function DevicesPage() {
     setDevices([...devices, {
       ...newDevice,
       id: generateDeviceId(newDevice.preset),
-      image: 'https://source.unsplash.com/random/400x300?dj,lighting',
+      image: DEVICE_IMAGE,
       preset: newDevice.preset
     }])
     setShowForm(false)
@@ -95,7 +97,7 @@ export default function DevicesPage() {
             key={device.id}
             id={device.id}
             name={device.name}
-            image={device.image}
+            image={DEVICE_IMAGE}
             onEdit={() => setEditingDevice(device)}
             onRemove={() => setDeviceToRemove(device.id)}
           />

@@ -3,7 +3,8 @@ import HomePage from './pages/HomePage'
 import DevicesPage from './pages/DevicesPage'
 import SettingsPage from './pages/SettingsPage'
 import ShowControlPage from './pages/ShowControlPage'
-import { Home, Settings, Disc, Play } from 'lucide-react'
+import ManualControlPage from './pages/ManualControlPage'
+import { Home, Settings, Disc, Play, Sliders } from 'lucide-react'
 
 export default function App() {
   return (
@@ -47,6 +48,13 @@ export default function App() {
                     Show Control
                   </Link>
                   <Link
+                    to="/manual-control"
+                    className="flex items-center px-3 py-2 text-gray-300 hover:text-white transition-colors"
+                  >
+                    <Sliders className="w-5 h-5 mr-2" />
+                    Manual Control
+                  </Link>
+                  <Link
                     to="/settings"
                     className="flex items-center px-3 py-2 text-gray-300 hover:text-white transition-colors"
                   >
@@ -78,6 +86,7 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/devices" element={<DevicesPage />} />
             <Route path="/show-control" element={<ShowControlPage />} />
+            <Route path="/manual-control" element={<ManualControlPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Routes>
         </main>
