@@ -2,20 +2,40 @@ import { useState, useEffect } from 'react'
 import { Play, Download } from 'lucide-react'
 
 export default function ShowControlPage() {
-  const [isRunning, setIsRunning] = useState(false)
-  const [logs, setLogs] = useState<string[]>([])
-  const [showConsoleLogs, setShowConsoleLogs] = useState(false)
+  const [isRunning, setIsRunning] = useState(() => {
+    const saved = localStorage.getItem('showRunningState')
+    return saved === 'true'
+  })
+  
+  const [logs, setLogs] = useState<string[]>(() => {
+    const saved = localStorage.getItem('showLogs')
+    return saved ? JSON.parse(saved) : []
+  })
+  
+  const [showConsoleLogs, setShowConsoleLogs] = useState(() => {
+    const saved = localStorage.getItem('showConsoleLogs')
+    return saved === 'true'
+  })
 
+  // Save running state to localStorage
   useEffect(() => {
-    const savedSetting = localStorage.getItem('showConsoleLogs')
-    if (savedSetting) {
-      setShowConsoleLogs(savedSetting === 'true')
-    }
-  }, [])
+    localStorage.setItem('showRunningState', isRunning.toString())
+  }, [isRunning])
+
+  // Save logs to localStorage
+  useEffect(() => {
+    localStorage.setItem('showLogs', JSON.stringify(logs))
+  }, [logs])
+
+  // Save console logs visibility to localStorage
+  useEffect(() => {
+    localStorage.setItem('showConsoleLogs', showConsoleLogs.toString())
+  }, [showConsoleLogs])
 
   const handleStartShow = () => {
     const action = isRunning ? 'Stopping' : 'Starting'
-    setLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${action} show...`])
+    const newLogs = [...logs, `${new Date().toLocaleTimeString()}: ${action} show...`]
+    setLogs(newLogs)
     setIsRunning(prev => !prev)
   }
 
