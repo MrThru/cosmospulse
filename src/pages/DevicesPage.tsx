@@ -11,6 +11,31 @@ function generateDeviceId(preset: string) {
   return preset === 'Custom' ? `OTH-${randomNumber}` : `COS-${randomNumber}`
 }
 
+async function sendDeviceToServer(device) {
+  try {
+    const response = await fetch('http://localhost:1323', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        constructdevice: {
+          id: device.id,
+          type: device.preset,
+          addstart: device.dmxAddress,
+          addsize: device.size
+        }
+      })
+    })
+    
+    if (!response.ok) {
+      throw new Error('Failed to send device to server')
+    }
+  } catch (error) {
+    console.error('Error sending device to server:', error)
+  }
+}
+
 export default function DevicesPage() {
   const [devices, setDevices] = useState([])
   const [showForm, setShowForm] = useState(false)
@@ -24,15 +49,21 @@ export default function DevicesPage() {
     }
   }, [])
 
-  const handleAddDevice = (newDevice) => {
-    const updatedDevices = [...devices, {
+  const handleAddDevice = async (newDevice) => {
+    const device = {
       ...newDevice,
       id: generateDeviceId(newDevice.preset),
       image: DEVICE_IMAGE,
       preset: newDevice.preset
-    }]
+    }
+    
+    const updatedDevices = [...devices, device]
     setDevices(updatedDevices)
     localStorage.setItem('devices', JSON.stringify(updatedDevices))
+    
+    // Send device to Flask server
+    await sendDeviceToServer(device)
+    
     setShowForm(false)
   }
 
