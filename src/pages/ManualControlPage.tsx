@@ -9,6 +9,30 @@ interface Device {
   preset: string
 }
 
+async function sendControlUpdate(deviceId: string, channel: number, value: number) {
+  try {
+    const response = await fetch('http://localhost:1323/data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        directcontroldevice: {
+          id: deviceId,
+          channel: channel,
+          value: value
+        }
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to update device control')
+    }
+  } catch (error) {
+    console.error('Error updating device control:', error)
+  }
+}
+
 export default function ManualControlPage() {
   const [devices, setDevices] = useState<Device[]>([])
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null)
@@ -44,12 +68,18 @@ export default function ManualControlPage() {
     localStorage.setItem('selectedDeviceId', device.id)
   }
 
-  const handleChannelChange = (index: number, value: number) => {
+  const handleChannelChange = async (index: number, value: number) => {
     const newValues = [...channelValues]
     newValues[index] = value
     setChannelValues(newValues)
+    
     if (selectedDevice) {
       localStorage.setItem(`channelValues-${selectedDevice.id}`, JSON.stringify(newValues))
+      await sendControlUpdate(
+        selectedDevice.id,
+        parseInt(selectedDevice.dmxAddress) + index,
+        value
+      )
     }
   }
 

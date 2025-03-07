@@ -17,15 +17,12 @@ interface DeviceFormProps {
 
 const PRESET_CONFIG = {
   Nebula: {
-    dmxAddress: '1',
-    size: '24'
+    size: '8'
   },
   Galaxy: {
-    dmxAddress: '25',
     size: '32'
   },
   Custom: {
-    dmxAddress: '',
     size: ''
   }
 }
@@ -39,7 +36,6 @@ export default function DeviceForm({ initialData, onSubmit }: DeviceFormProps) {
 
   useEffect(() => {
     if (preset !== 'Custom') {
-      setDmxAddress(PRESET_CONFIG[preset].dmxAddress)
       setSize(PRESET_CONFIG[preset].size)
     }
     setIsCustom(preset === 'Custom')
@@ -83,11 +79,8 @@ export default function DeviceForm({ initialData, onSubmit }: DeviceFormProps) {
           type="number"
           value={dmxAddress}
           onChange={(e) => setDmxAddress(e.target.value)}
-          className={`mt-1 block w-full rounded-md bg-black/20 border border-cosmos/10 text-white focus:border-cosmos focus:ring-cosmos ${
-            !isCustom ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
+          className="mt-1 block w-full rounded-md bg-black/20 border border-cosmos/10 text-white focus:border-cosmos focus:ring-cosmos"
           required
-          disabled={!isCustom}
         />
       </div>
 

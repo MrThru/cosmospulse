@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import DeviceCard from '../components/DeviceCard'
 import DeviceForm from '../components/DeviceForm'
 import EditDeviceModal from '../components/EditDeviceModal'
-import { Plus } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 
 const DEVICE_IMAGE = "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
 
@@ -13,7 +13,7 @@ function generateDeviceId(preset: string) {
 
 async function sendDeviceToServer(device) {
   try {
-    const response = await fetch('http://localhost:1323', {
+    const response = await fetch('http://localhost:1323/data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -100,6 +100,15 @@ export default function DevicesPage() {
       {showForm && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-black/70 rounded-lg p-6 max-w-md w-full border border-cosmos/20">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-white">Add New Device</h2>
+              <button
+                onClick={() => setShowForm(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
             <DeviceForm onSubmit={handleAddDevice} />
           </div>
         </div>
