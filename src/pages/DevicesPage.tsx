@@ -3,15 +3,28 @@ import DeviceCard from '../components/DeviceCard'
 import DeviceForm from '../components/DeviceForm'
 import EditDeviceModal from '../components/EditDeviceModal'
 import { Plus, X } from 'lucide-react'
+import { useLanguage } from '../contexts/LanguageContext'
+import type { Channel } from '../components/ChannelConfig'
 
 const DEVICE_IMAGE = "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+
+interface Device {
+  id: string
+  name: string
+  dmxAddress: string
+  size: string
+  preset: string
+  deviceType: string
+  image: string
+  channels?: Channel[]
+}
 
 function generateDeviceId(preset: string) {
   const randomNumber = Math.floor(Math.random() * 900) + 100
   return preset === 'Custom' ? `OTH-${randomNumber}` : `COS-${randomNumber}`
 }
 
-async function sendDeviceToServer(device) {
+async function sendDeviceToServer(device: Device) {
   try {
     const response = await fetch('http://localhost:1323/data', {
       method: 'POST',
@@ -21,9 +34,10 @@ async function sendDeviceToServer(device) {
       body: JSON.stringify({
         constructdevice: {
           id: device.id,
-          type: device.preset,
+          type: device.deviceType,
           addstart: device.dmxAddress,
-          addsize: device.size
+          addsize: device.size,
+          channels: device.channels
         }
       })
     })
@@ -37,10 +51,32 @@ async function sendDeviceToServer(device) {
 }
 
 export default function DevicesPage() {
-  const [devices, setDevices] = useState([])
+  const { language } = useLanguage()
+  const [devices, setDevices] = useState<Device[]>([])
   const [showForm, setShowForm] = useState(false)
-  const [editingDevice, setEditingDevice] = useState(null)
-  const [deviceToRemove, setDeviceToRemove] = useState(null)
+  const [editingDevice, setEditingDevice] = useState<Device | null>(null)
+  const [deviceToRemove, setDeviceToRemove] = useState<string | null>(null)
+
+  const translations = {
+    en: {
+      title: "DMX Devices",
+      addDevice: "Add Device",
+      addNewDevice: "Add New Device",
+      confirmRemoval: "Confirm Removal",
+      removeConfirmation: "Are you sure you want to remove this device?",
+      cancel: "Cancel",
+      remove: "Remove Device"
+    },
+    es: {
+      title: "Dispositivos DMX",
+      addDevice: "Agregar Dispositivo",
+      addNewDevice: "Agregar Nuevo Dispositivo",
+      confirmRemoval: "Confirmar Eliminación",
+      removeConfirmation: "¿Está seguro de que desea eliminar este dispositivo?",
+      cancel: "Cancelar",
+      remove: "Eliminar Dispositivo"
+    }
+  }
 
   useEffect(() => {
     const storedDevices = localStorage.getItem('devices')
@@ -61,7 +97,6 @@ export default function DevicesPage() {
     setDevices(updatedDevices)
     localStorage.setItem('devices', JSON.stringify(updatedDevices))
     
-    // Send device to Flask server
     await sendDeviceToServer(device)
     
     setShowForm(false)
@@ -84,16 +119,18 @@ export default function DevicesPage() {
     setDeviceToRemove(null)
   }
 
+  const t = translations[language]
+
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-white">DMX Devices</h1>
+        <h1 className="text-3xl font-bold text-white">{t.title}</h1>
         <button
           onClick={() => setShowForm(true)}
           className="bg-cosmos text-white px-4 py-2 rounded-md hover:bg-cosmos-light transition-colors flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
-          Add Device
+          {t.addDevice}
         </button>
       </div>
 
@@ -101,7 +138,7 @@ export default function DevicesPage() {
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-black/70 rounded-lg p-6 max-w-md w-full border border-cosmos/20">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-white">Add New Device</h2>
+              <h2 className="text-xl font-bold text-white">{t.addNewDevice}</h2>
               <button
                 onClick={() => setShowForm(false)}
                 className="text-gray-400 hover:text-white transition-colors"
@@ -125,20 +162,20 @@ export default function DevicesPage() {
       {deviceToRemove && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-black/70 rounded-lg p-6 max-w-md w-full border border-cosmos/20">
-            <h2 className="text-xl font-bold text-white mb-4">Confirm Removal</h2>
-            <p className="text-gray-300 mb-6">Are you sure you want to remove this device?</p>
+            <h2 className="text-xl font-bold text-white mb-4">{t.confirmRemoval}</h2>
+            <p className="text-gray-300 mb-6">{t.removeConfirmation}</p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setDeviceToRemove(null)}
                 className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
               >
-                Cancel
+                {t.cancel}
               </button>
               <button
                 onClick={handleRemoveDevice}
                 className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
               >
-                Remove Device
+                {t.remove}
               </button>
             </div>
           </div>

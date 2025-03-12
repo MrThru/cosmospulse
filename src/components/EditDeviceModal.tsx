@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import DeviceForm from './DeviceForm'
+import type { Channel } from './ChannelConfig'
 
 interface EditDeviceModalProps {
   device: {
@@ -8,6 +9,7 @@ interface EditDeviceModalProps {
     dmxAddress: string
     size: string
     preset: string
+    channels?: Channel[]
   }
   onSave: (data: {
     id: string
@@ -15,6 +17,7 @@ interface EditDeviceModalProps {
     dmxAddress: string
     size: string
     preset: string
+    channels: Channel[]
   }) => void
   onClose: () => void
 }

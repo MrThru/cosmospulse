@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 interface Device {
   id: string
@@ -34,9 +35,27 @@ async function sendControlUpdate(deviceId: string, channel: number, value: numbe
 }
 
 export default function ManualControlPage() {
+  const { language } = useLanguage()
   const [devices, setDevices] = useState<Device[]>([])
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null)
   const [channelValues, setChannelValues] = useState<number[]>([])
+
+  const translations = {
+    en: {
+      title: "Manual Device Control",
+      selectDevice: "Select a device...",
+      channelControls: "Channel Controls for",
+      channel: "Channel"
+    },
+    es: {
+      title: "Control Manual de Dispositivos",
+      selectDevice: "Seleccionar un dispositivo...",
+      channelControls: "Controles de Canal para",
+      channel: "Canal"
+    }
+  }
+
+  const t = translations[language]
 
   useEffect(() => {
     const storedDevices = localStorage.getItem('devices')
@@ -86,7 +105,7 @@ export default function ManualControlPage() {
   return (
     <div className="container mx-auto p-4">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 text-white text-center">Manual Device Control</h1>
+        <h1 className="text-3xl font-bold mb-8 text-white text-center">{t.title}</h1>
 
         <div className="bg-black/30 p-6 rounded-lg border border-cosmos/10 mb-8">
           <div className="relative">
@@ -98,7 +117,7 @@ export default function ManualControlPage() {
                 if (device) handleDeviceSelect(device)
               }}
             >
-              <option value="">Select a device...</option>
+              <option value="">{t.selectDevice}</option>
               {devices.map(device => (
                 <option key={device.id} value={device.id}>
                   {device.name} ({device.id})
@@ -112,13 +131,13 @@ export default function ManualControlPage() {
         {selectedDevice && (
           <div className="bg-black/30 p-6 rounded-lg border border-cosmos/10">
             <h2 className="text-xl font-bold mb-6 text-white">
-              Channel Controls for {selectedDevice.name}
+              {t.channelControls} {selectedDevice.name}
             </h2>
             <div className="space-y-6">
               {channelValues.map((value, index) => (
                 <div key={index} className="space-y-2">
                   <div className="flex justify-between text-sm text-gray-300">
-                    <span>Channel {index + 1}</span>
+                    <span>{t.channel} {index + 1}</span>
                     <span>{value}</span>
                   </div>
                   <input

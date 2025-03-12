@@ -5,8 +5,29 @@ import SettingsPage from './pages/SettingsPage'
 import ShowControlPage from './pages/ShowControlPage'
 import ManualControlPage from './pages/ManualControlPage'
 import { Home, Settings, Disc, Play, Sliders } from 'lucide-react'
+import { useLanguage } from './contexts/LanguageContext'
+
+const translations = {
+  en: {
+    home: 'Home',
+    devices: 'Devices',
+    showControl: 'Show Control',
+    manualControl: 'Manual Control',
+    settings: 'Settings'
+  },
+  es: {
+    home: 'Inicio',
+    devices: 'Dispositivos',
+    showControl: 'Control de Show',
+    manualControl: 'Control Manual',
+    settings: 'Configuración'
+  }
+}
 
 export default function App() {
+  const { language } = useLanguage()
+  const t = translations[language]
+
   return (
     <Router>
       <div className="min-h-screen bg-black cosmos-gradient from-cosmos via-cosmos-dark to-black select-none">
@@ -31,50 +52,36 @@ export default function App() {
                     className="flex items-center px-3 py-2 text-gray-300 hover:text-white transition-colors"
                   >
                     <Home className="w-5 h-5 mr-2" />
-                    Home
+                    {t.home}
                   </Link>
                   <Link
                     to="/devices"
                     className="flex items-center px-3 py-2 text-gray-300 hover:text-white transition-colors"
                   >
                     <Disc className="w-5 h-5 mr-2" />
-                    Devices
+                    {t.devices}
                   </Link>
                   <Link
                     to="/show-control"
                     className="flex items-center px-3 py-2 text-gray-300 hover:text-white transition-colors"
                   >
                     <Play className="w-5 h-5 mr-2" />
-                    Show Control
+                    {t.showControl}
                   </Link>
                   <Link
                     to="/manual-control"
                     className="flex items-center px-3 py-2 text-gray-300 hover:text-white transition-colors"
                   >
                     <Sliders className="w-5 h-5 mr-2" />
-                    Manual Control
+                    {t.manualControl}
                   </Link>
                   <Link
                     to="/settings"
                     className="flex items-center px-3 py-2 text-gray-300 hover:text-white transition-colors"
                   >
                     <Settings className="w-5 h-5 mr-2" />
-                    Settings
+                    {t.settings}
                   </Link>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="flex space-x-2 ml-4">
-                    <button
-                      className="px-4 py-2 text-sm font-medium text-white bg-cosmos/50 hover:bg-cosmos/70 rounded-md transition-colors"
-                    >
-                      Sign In
-                    </button>
-                    <button
-                      className="px-4 py-2 text-sm font-medium text-white bg-cosmos hover:bg-cosmos-light rounded-md transition-colors"
-                    >
-                      Create Account
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
